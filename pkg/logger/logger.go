@@ -6,7 +6,16 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func Init() {
-	logrus.SetOutput(os.Stdout)
-	logrus.SetLevel(logrus.DebugLevel)
+var log *logrus.Logger
+
+func init() {
+	log = logrus.New()
+	log.SetOutput(os.Stdout)
+	log.SetFormatter(&logrus.TextFormatter{
+		FullTimestamp: true,
+	})
+}
+
+func GetLogger() *logrus.Logger {
+	return log
 }

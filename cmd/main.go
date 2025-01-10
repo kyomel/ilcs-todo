@@ -13,13 +13,11 @@ import (
 	database "github.com/kyomel/ilcs-todo/internal/infrastructure/database"
 	tUC "github.com/kyomel/ilcs-todo/internal/usecase/task/interfaces"
 	"github.com/kyomel/ilcs-todo/pkg/config"
-	"github.com/kyomel/ilcs-todo/pkg/logger"
 	"github.com/labstack/echo/v4"
 )
 
 func main() {
 	configApp := config.LoadConfig()
-	logger.Init()
 	e := echo.New()
 
 	dbInstance, err := database.NewDatabase(configApp.DatabaseURL)
