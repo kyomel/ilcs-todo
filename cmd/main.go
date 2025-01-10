@@ -7,12 +7,13 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/kyomel/ilcs-todo/internal/config"
-	rest "github.com/kyomel/ilcs-todo/internal/delivery/rest"
-	"github.com/kyomel/ilcs-todo/internal/infrastructure/datastore"
-	"github.com/kyomel/ilcs-todo/internal/logger"
-	tRepo "github.com/kyomel/ilcs-todo/internal/repository/task"
-	tUC "github.com/kyomel/ilcs-todo/internal/usecase/task"
+	"github.com/kyomel/ilcs-todo/internal/delivery/http/handlers"
+	"github.com/kyomel/ilcs-todo/internal/delivery/http/router"
+	tRepo "github.com/kyomel/ilcs-todo/internal/domain/task/repository"
+	database "github.com/kyomel/ilcs-todo/internal/infrastructure/database"
+	tUC "github.com/kyomel/ilcs-todo/internal/usecase/task/interfaces"
+	"github.com/kyomel/ilcs-todo/pkg/config"
+	"github.com/kyomel/ilcs-todo/pkg/logger"
 	"github.com/labstack/echo/v4"
 )
 
@@ -21,7 +22,7 @@ func main() {
 	logger.Init()
 	e := echo.New()
 
-	dbInstance, err := datastore.NewDatabase(configApp.DatabaseURL)
+	dbInstance, err := database.NewDatabase(configApp.DatabaseURL)
 	if err != nil {
 		panic(err)
 	}
@@ -31,9 +32,9 @@ func main() {
 	ctxTimeout := time.Duration(configApp.ContextTimeout) * time.Second
 	taskUC := tUC.NewUsecase(taskRepo, ctxTimeout)
 
-	h := rest.NewHandler(taskUC)
+	h := handlers.NewHandler(taskUC)
 
-	rest.LoadRoutes(e, h)
+	router.LoadRoutes(e, h)
 
 	go func() {
 		if err := e.Start(":14045"); err != nil && err != http.ErrServerClosed {

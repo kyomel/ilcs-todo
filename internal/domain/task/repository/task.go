@@ -2,9 +2,10 @@ package task
 
 import (
 	"context"
+
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
-	"github.com/kyomel/ilcs-todo/internal/model"
+	"github.com/kyomel/ilcs-todo/internal/domain/task/entity"
 )
 
 type taskRepo struct {
@@ -17,8 +18,8 @@ func NewTaskRepository(db *sqlx.DB) Repository {
 	}
 }
 
-func (r *taskRepo) PostTask(ctx context.Context, req *model.CreateTaskRequest) (*model.Task, error) {
-	var result model.Task
+func (r *taskRepo) PostTask(ctx context.Context, req *entity.CreateTaskRequest) (*entity.Task, error) {
+	var result entity.Task
 
 	// Parse due date
 	dueDate, err := req.ParseDueDate()

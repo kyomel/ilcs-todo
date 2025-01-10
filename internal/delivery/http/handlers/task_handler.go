@@ -1,12 +1,12 @@
-package rest
+package handlers
 
 import (
-	"github.com/kyomel/ilcs-todo/internal/model"
+	"github.com/kyomel/ilcs-todo/internal/domain/task/entity"
 	"github.com/labstack/echo/v4"
 )
 
-func (h *handler) PostTask(c echo.Context) error {
-	var req model.CreateTaskRequest
+func (h *Handlers) PostTask(c echo.Context) error {
+	var req entity.CreateTaskRequest
 	ctx := c.Request().Context()
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(400, map[string]interface{}{

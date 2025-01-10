@@ -1,10 +1,10 @@
-package model
+package entity
 
 import (
 	"fmt"
 	"time"
+
 	"github.com/google/uuid"
-	"github.com/kyomel/ilcs-todo/internal/constant"
 )
 
 type Task struct {
@@ -29,13 +29,12 @@ func (r *CreateTaskRequest) Validate() error {
 		return fmt.Errorf("title is required")
 	}
 
-	if r.Status != "" && !constant.IsValidTaskStatus(r.Status) {
+	if r.Status != "" && !IsValidTaskStatus(r.Status) {
 		return fmt.Errorf("invalid status: must be either 'pending' or 'completed'")
 	}
 
-	// Set default status if not provided
 	if r.Status == "" {
-		r.Status = string(constant.TaskStatusPending)
+		r.Status = string(TaskStatusPending)
 	}
 
 	return nil
