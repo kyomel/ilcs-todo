@@ -8,21 +8,35 @@ import (
 	"time"
 
 	"github.com/kyomel/ilcs-todo/internal/config"
-	delivery "github.com/kyomel/ilcs-todo/internal/delivery/http"
+	rest "github.com/kyomel/ilcs-todo/internal/delivery/rest"
+	"github.com/kyomel/ilcs-todo/internal/infrastructure/datastore"
 	"github.com/kyomel/ilcs-todo/internal/logger"
+	tRepo "github.com/kyomel/ilcs-todo/internal/repository/task"
+	tUC "github.com/kyomel/ilcs-todo/internal/usecase/task"
 	"github.com/labstack/echo/v4"
 )
 
 func main() {
 	configApp := config.LoadConfig()
-
 	logger.Init()
 	e := echo.New()
 
-	delivery.LoadRoutes(e)
+	dbInstance, err := datastore.NewDatabase(configApp.DatabaseURL)
+	if err != nil {
+		panic(err)
+	}
+
+	taskRepo := tRepo.NewTaskRepository(dbInstance)
+
+	ctxTimeout := time.Duration(configApp.ContextTimeout) * time.Second
+	taskUC := tUC.NewUsecase(taskRepo, ctxTimeout)
+
+	h := rest.NewHandler(taskUC)
+
+	rest.LoadRoutes(e, h)
 
 	go func() {
-		if err := e.Start(":8080"); err != nil && err != http.ErrServerClosed {
+		if err := e.Start(":14045"); err != nil && err != http.ErrServerClosed {
 			e.Logger.Fatal("shutting down the server")
 		}
 	}()
