@@ -31,3 +31,15 @@ func (uc *useCase) PostTask(ctx context.Context, req *entity.CreateTaskRequest) 
 
 	return task, err
 }
+
+func (uc *useCase) GetAllTasks(ctx context.Context) ([]*entity.Task, error) {
+	ctx, cancel := context.WithTimeout(ctx, uc.ctxTimeout)
+	defer cancel()
+
+	tasks, err := uc.taskRepo.GetAllTasks(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return tasks, err
+}

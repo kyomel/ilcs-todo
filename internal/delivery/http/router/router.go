@@ -12,4 +12,5 @@ func LoadRoutes(e *echo.Echo, handler *handlers.Handlers) {
 
 	taskGroup := e.Group("/tasks")
 	taskGroup.POST("", handler.PostTask)
+	taskGroup.GET("", handler.GetAllTasks)
 }

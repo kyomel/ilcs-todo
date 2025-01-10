@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	task "github.com/kyomel/ilcs-todo/internal/usecase/task/interfaces"
+	task "github.com/kyomel/ilcs-todo/internal/usecase/task"
 )
 
 type Handlers struct {

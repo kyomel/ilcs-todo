@@ -58,3 +58,41 @@ func (r *taskRepo) PostTask(ctx context.Context, req *entity.CreateTaskRequest) 
 
 	return &result, nil
 }
+
+func (r *taskRepo) GetAllTasks(ctx context.Context) ([]*entity.Task, error) {
+	var tasks []*entity.Task
+
+	query := `
+		SELECT id, title, description, status, due_date, created_at, updated_at
+		FROM tasks
+		ORDER BY created_at DESC
+	`
+
+	rows, err := r.db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var task entity.Task
+		if err := rows.Scan(
+			&task.ID,
+			&task.Title,
+			&task.Description,
+			&task.Status,
+			&task.DueDate,
+			&task.CreatedAt,
+			&task.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		tasks = append(tasks, &task)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return tasks, nil
+}

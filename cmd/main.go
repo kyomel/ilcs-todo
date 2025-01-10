@@ -11,7 +11,7 @@ import (
 	"github.com/kyomel/ilcs-todo/internal/delivery/http/router"
 	tRepo "github.com/kyomel/ilcs-todo/internal/domain/task/repository"
 	database "github.com/kyomel/ilcs-todo/internal/infrastructure/database"
-	tUC "github.com/kyomel/ilcs-todo/internal/usecase/task/interfaces"
+	tUC "github.com/kyomel/ilcs-todo/internal/usecase/task"
 	"github.com/kyomel/ilcs-todo/pkg/config"
 	"github.com/labstack/echo/v4"
 )

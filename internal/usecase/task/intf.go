@@ -8,4 +8,5 @@ import (
 
 type Usecase interface {
 	PostTask(ctx context.Context, req *entity.CreateTaskRequest) (*entity.Task, error)
+	GetAllTasks(ctx context.Context) ([]*entity.Task, error)
 }
