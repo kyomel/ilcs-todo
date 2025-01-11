@@ -15,14 +15,14 @@ type Task struct {
 	DueDate     time.Time `json:"due_date"`
 }
 
-type CreateTaskRequest struct {
+type TaskRequest struct {
 	Title       string `json:"title" validate:"required"`
 	Description string `json:"description"`
 	Status      string `json:"status"`
 	DueDate     string `json:"due_date"`
 }
 
-func (r *CreateTaskRequest) Validate() error {
+func (r *TaskRequest) Validate() error {
 	if r.Title == "" {
 		return fmt.Errorf("title is required")
 	}
@@ -38,7 +38,7 @@ func (r *CreateTaskRequest) Validate() error {
 	return nil
 }
 
-func (r *CreateTaskRequest) ParseDueDate() (time.Time, error) {
+func (r *TaskRequest) ParseDueDate() (time.Time, error) {
 	if r.DueDate == "" {
 		return time.Time{}, nil
 	}
