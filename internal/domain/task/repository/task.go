@@ -114,3 +114,53 @@ func (r *taskRepo) GetTaskByID(ctx context.Context, id uuid.UUID) (*model.Task, 
 
 	return &result, nil
 }
+
+func (r *taskRepo) UpdateTask(ctx context.Context, id uuid.UUID, req *model.TaskRequest) (*model.Task, error) {
+	var result model.Task
+
+	dueDate, err := req.ParseDueDate()
+	if err != nil {
+		return nil, err
+	}
+
+	query := `
+		UPDATE tasks
+		SET title = $2, description = $3, status = $4, due_date = $5
+		WHERE id = $1
+		RETURNING id, title, description, status, due_date
+	`
+
+	err = r.db.QueryRowContext(ctx, query,
+		id,
+		req.Title,
+		req.Description,
+		req.Status,
+		dueDate,
+	).Scan(
+		&result.ID,
+		&result.Title,
+		&result.Description,
+		&result.Status,
+		&result.DueDate,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+func (r *taskRepo) DeleteTask(ctx context.Context, id uuid.UUID) error {
+	query := `
+		DELETE FROM tasks
+		WHERE id = $1
+	`
+
+	_, err := r.db.ExecContext(ctx, query, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -56,3 +56,27 @@ func (uc *useCase) GetTaskByID(ctx context.Context, id uuid.UUID) (*model.Task, 
 
 	return task, err
 }
+
+func (uc *useCase) UpdateTask(ctx context.Context, id uuid.UUID, req *model.TaskRequest) (*model.Task, error) {
+	ctx, cancel := context.WithTimeout(ctx, uc.ctxTimeout)
+	defer cancel()
+
+	task, err := uc.taskRepo.UpdateTask(ctx, id, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return task, err
+}
+
+func (uc *useCase) DeleteTask(ctx context.Context, id uuid.UUID) error {
+	ctx, cancel := context.WithTimeout(ctx, uc.ctxTimeout)
+	defer cancel()
+
+	err := uc.taskRepo.DeleteTask(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

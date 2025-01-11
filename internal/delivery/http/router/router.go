@@ -14,4 +14,6 @@ func LoadRoutes(e *echo.Echo, handler *handlers.Handlers) {
 	taskGroup.POST("", handler.PostTask)
 	taskGroup.GET("", handler.GetAllTasks)
 	taskGroup.GET("/:id", handler.GetTaskByID)
+	taskGroup.PUT("/:id", handler.UpdateTask)
+	taskGroup.DELETE("/:id", handler.DeleteTask)
 }
