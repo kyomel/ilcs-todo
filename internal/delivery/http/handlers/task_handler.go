@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"github.com/kyomel/ilcs-todo/internal/domain/task/entity"
+	"github.com/kyomel/ilcs-todo/internal/domain/task/model"
 	"github.com/kyomel/ilcs-todo/pkg/logger"
 	"github.com/labstack/echo/v4"
 )
@@ -10,7 +10,7 @@ func (h *Handlers) PostTask(c echo.Context) error {
 	log := logger.GetLogger()
 	log.Info("Received a request to post a task")
 
-	var req entity.CreateTaskRequest
+	var req model.CreateTaskRequest
 	ctx := c.Request().Context()
 	if err := c.Bind(&req); err != nil {
 		log.Errorf("Failed to bind request: %v", err)

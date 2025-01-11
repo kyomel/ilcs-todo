@@ -5,7 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
-	"github.com/kyomel/ilcs-todo/internal/domain/task/entity"
+	"github.com/kyomel/ilcs-todo/internal/domain/task/model"
 )
 
 type taskRepo struct {
@@ -18,16 +18,14 @@ func NewTaskRepository(db *sqlx.DB) Repository {
 	}
 }
 
-func (r *taskRepo) PostTask(ctx context.Context, req *entity.CreateTaskRequest) (*entity.Task, error) {
-	var result entity.Task
+func (r *taskRepo) PostTask(ctx context.Context, req *model.CreateTaskRequest) (*model.Task, error) {
+	var result model.Task
 
-	// Parse due date
 	dueDate, err := req.ParseDueDate()
 	if err != nil {
 		return nil, err
 	}
 
-	// Generate UUID
 	taskID := uuid.New()
 
 	query := `
@@ -59,8 +57,8 @@ func (r *taskRepo) PostTask(ctx context.Context, req *entity.CreateTaskRequest) 
 	return &result, nil
 }
 
-func (r *taskRepo) GetAllTasks(ctx context.Context) ([]*entity.Task, error) {
-	var tasks []*entity.Task
+func (r *taskRepo) GetAllTasks(ctx context.Context) ([]*model.Task, error) {
+	var tasks []*model.Task
 
 	query := `
 		SELECT id, title, description, status, due_date, created_at, updated_at
@@ -75,7 +73,7 @@ func (r *taskRepo) GetAllTasks(ctx context.Context) ([]*entity.Task, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var task entity.Task
+		var task model.Task
 		if err := rows.Scan(
 			&task.ID,
 			&task.Title,

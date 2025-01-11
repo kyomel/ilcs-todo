@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/kyomel/ilcs-todo/internal/domain/task/entity"
+	"github.com/kyomel/ilcs-todo/internal/domain/task/model"
 	task "github.com/kyomel/ilcs-todo/internal/domain/task/repository"
 )
 
@@ -20,7 +20,7 @@ func NewUsecase(taskRepo task.Repository, ctxTimeout time.Duration) Usecase {
 	}
 }
 
-func (uc *useCase) PostTask(ctx context.Context, req *entity.CreateTaskRequest) (*entity.Task, error) {
+func (uc *useCase) PostTask(ctx context.Context, req *model.CreateTaskRequest) (*model.Task, error) {
 	ctx, cancel := context.WithTimeout(ctx, uc.ctxTimeout)
 	defer cancel()
 
@@ -32,7 +32,7 @@ func (uc *useCase) PostTask(ctx context.Context, req *entity.CreateTaskRequest) 
 	return task, err
 }
 
-func (uc *useCase) GetAllTasks(ctx context.Context) ([]*entity.Task, error) {
+func (uc *useCase) GetAllTasks(ctx context.Context) ([]*model.Task, error) {
 	ctx, cancel := context.WithTimeout(ctx, uc.ctxTimeout)
 	defer cancel()
 
