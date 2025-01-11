@@ -11,7 +11,7 @@ func (h *Handlers) PostTask(c echo.Context) error {
 	log := logger.GetLogger()
 	log.Info("Received a request to post a task")
 
-	var req model.CreateTaskRequest
+	var req model.TaskRequest
 	ctx := c.Request().Context()
 	if err := c.Bind(&req); err != nil {
 		log.Errorf("Failed to bind request: %v", err)

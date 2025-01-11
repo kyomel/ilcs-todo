@@ -21,7 +21,7 @@ func NewUsecase(taskRepo task.Repository, ctxTimeout time.Duration) Usecase {
 	}
 }
 
-func (uc *useCase) PostTask(ctx context.Context, req *model.CreateTaskRequest) (*model.Task, error) {
+func (uc *useCase) PostTask(ctx context.Context, req *model.TaskRequest) (*model.Task, error) {
 	ctx, cancel := context.WithTimeout(ctx, uc.ctxTimeout)
 	defer cancel()
 

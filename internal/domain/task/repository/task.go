@@ -18,7 +18,7 @@ func NewTaskRepository(db *sqlx.DB) Repository {
 	}
 }
 
-func (r *taskRepo) PostTask(ctx context.Context, req *model.CreateTaskRequest) (*model.Task, error) {
+func (r *taskRepo) PostTask(ctx context.Context, req *model.TaskRequest) (*model.Task, error) {
 	var result model.Task
 
 	dueDate, err := req.ParseDueDate()

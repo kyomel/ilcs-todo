@@ -8,7 +8,7 @@ import (
 )
 
 type Usecase interface {
-	PostTask(ctx context.Context, req *model.CreateTaskRequest) (*model.Task, error)
+	PostTask(ctx context.Context, req *model.TaskRequest) (*model.Task, error)
 	GetAllTasks(ctx context.Context) ([]*model.Task, error)
 	GetTaskByID(ctx context.Context, id uuid.UUID) (*model.Task, error)
 }
