@@ -31,7 +31,7 @@ func (r *taskRepo) PostTask(ctx context.Context, req *model.CreateTaskRequest) (
 	query := `
 		INSERT INTO tasks (id, title, description, status, due_date)
 		VALUES ($1, $2, $3, $4, $5)
-		RETURNING id, title, description, status, due_date, created_at, updated_at
+		RETURNING id, title, description, status, due_date
 	`
 
 	err = r.db.QueryRowContext(ctx, query,
@@ -46,8 +46,6 @@ func (r *taskRepo) PostTask(ctx context.Context, req *model.CreateTaskRequest) (
 		&result.Description,
 		&result.Status,
 		&result.DueDate,
-		&result.CreatedAt,
-		&result.UpdatedAt,
 	)
 
 	if err != nil {
@@ -61,9 +59,9 @@ func (r *taskRepo) GetAllTasks(ctx context.Context) ([]*model.Task, error) {
 	var tasks []*model.Task
 
 	query := `
-		SELECT id, title, description, status, due_date, created_at, updated_at
+		SELECT id, title, description, status, due_date
 		FROM tasks
-		ORDER BY created_at DESC
+		ORDER BY due_date ASC
 	`
 
 	rows, err := r.db.QueryContext(ctx, query)
@@ -80,8 +78,6 @@ func (r *taskRepo) GetAllTasks(ctx context.Context) ([]*model.Task, error) {
 			&task.Description,
 			&task.Status,
 			&task.DueDate,
-			&task.CreatedAt,
-			&task.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -93,4 +89,28 @@ func (r *taskRepo) GetAllTasks(ctx context.Context) ([]*model.Task, error) {
 	}
 
 	return tasks, nil
+}
+
+func (r *taskRepo) GetTaskByID(ctx context.Context, id uuid.UUID) (*model.Task, error) {
+	var result model.Task
+
+	query := `
+		SELECT id, title, description, status, due_date
+		FROM tasks
+		WHERE id = $1
+	`
+
+	err := r.db.QueryRowContext(ctx, query, id).Scan(
+		&result.ID,
+		&result.Title,
+		&result.Description,
+		&result.Status,
+		&result.DueDate,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &result, nil
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/kyomel/ilcs-todo/internal/domain/task/model"
 	task "github.com/kyomel/ilcs-todo/internal/domain/task/repository"
 )
@@ -42,4 +43,16 @@ func (uc *useCase) GetAllTasks(ctx context.Context) ([]*model.Task, error) {
 	}
 
 	return tasks, err
+}
+
+func (uc *useCase) GetTaskByID(ctx context.Context, id uuid.UUID) (*model.Task, error) {
+	ctx, cancel := context.WithTimeout(ctx, uc.ctxTimeout)
+	defer cancel()
+
+	task, err := uc.taskRepo.GetTaskByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return task, err
 }
