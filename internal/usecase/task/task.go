@@ -33,7 +33,7 @@ func (uc *useCase) PostTask(ctx context.Context, req *model.TaskRequest) (*model
 	return task, err
 }
 
-func (uc *useCase) GetAllTasks(ctx context.Context, page, limit int) (*model.AllTasks, error) {
+func (uc *useCase) GetAllTasks(ctx context.Context, page, limit int, status string) (*model.AllTasks, error) {
 	ctx, cancel := context.WithTimeout(ctx, uc.ctxTimeout)
 	defer cancel()
 
@@ -42,17 +42,19 @@ func (uc *useCase) GetAllTasks(ctx context.Context, page, limit int) (*model.All
 	errorChan := make(chan error, 2)
 
 	go func() {
-		tasks, err := uc.taskRepo.GetTasksPaginated(ctx, page, limit)
+		tasks, err := uc.taskRepo.GetTasksPaginated(ctx, page, limit, status)
 		if err != nil {
 			errorChan <- err
+			return
 		}
 		tasksChan <- tasks
 	}()
 
 	go func() {
-		total, err := uc.taskRepo.GetTotalTasks(ctx)
+		total, err := uc.taskRepo.GetTotalTasksWithFilter(ctx, status)
 		if err != nil {
 			errorChan <- err
+			return
 		}
 		totalChan <- total
 	}()

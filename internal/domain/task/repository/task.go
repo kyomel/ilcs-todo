@@ -55,17 +55,32 @@ func (r *taskRepo) PostTask(ctx context.Context, req *model.TaskRequest) (*model
 	return &result, nil
 }
 
-func (r *taskRepo) GetTasksPaginated(ctx context.Context, page, limit int) ([]*model.Task, error) {
+func (r *taskRepo) GetTasksPaginated(ctx context.Context, page, limit int, status string) ([]*model.Task, error) {
 	offset := (page - 1) * limit
 
-	query := `
-		SELECT id, title, description, status, due_date
-		FROM tasks
-		ORDER BY created_at DESC
-		LIMIT $1 OFFSET $2
-	`
+	var query string
+	var args []interface{}
+	args = append(args, limit, offset)
 
-	rows, err := r.db.QueryContext(ctx, query, limit, offset)
+	if status != "" {
+		query = `
+			SELECT id, title, description, status, due_date
+			FROM tasks
+			WHERE status = $3
+			ORDER BY created_at DESC
+			LIMIT $1 OFFSET $2
+		`
+		args = append(args, status)
+	} else {
+		query = `
+			SELECT id, title, description, status, due_date
+			FROM tasks
+			ORDER BY created_at DESC
+			LIMIT $1 OFFSET $2
+		`
+	}
+
+	rows, err := r.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -90,11 +105,19 @@ func (r *taskRepo) GetTasksPaginated(ctx context.Context, page, limit int) ([]*m
 	return tasks, nil
 }
 
-func (r *taskRepo) GetTotalTasks(ctx context.Context) (int, error) {
-	var total int
-	query := `SELECT COUNT(*) FROM tasks`
+func (r *taskRepo) GetTotalTasksWithFilter(ctx context.Context, status string) (int, error) {
+	var query string
+	var args []interface{}
 
-	err := r.db.QueryRowContext(ctx, query).Scan(&total)
+	if status != "" {
+		query = `SELECT COUNT(*) FROM tasks WHERE status = $1`
+		args = append(args, status)
+	} else {
+		query = `SELECT COUNT(*) FROM tasks`
+	}
+
+	var total int
+	err := r.db.QueryRowContext(ctx, query, args...).Scan(&total)
 	if err != nil {
 		return 0, err
 	}
