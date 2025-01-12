@@ -47,7 +47,7 @@ func (uc *useCase) Login(ctx context.Context, req *model.Login) (*model.LoginRes
 		return nil, err
 	}
 
-	token, err := util.GenerateToken(users.ID, users.Email, users.FullName, os.Getenv("JWT_SECRET_KEY"))
+	token, err := util.GenerateToken(users.ID, users.Email, users.FullName, os.Getenv("JWT_SECRET"))
 	if err != nil {
 		return nil, err
 	}
