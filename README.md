@@ -19,7 +19,11 @@ go run cmd/main.go
 ```
 go install github.com/pressly/goose/v3/cmd/goose@latest
 ```
-2. Run the migrations:
+2. Going to migrations folder:
+```
+cd migrations/schema
+```
+3. Run the migrations:
 ```
 goose -dir migrations postgres "postgres://postgres:password@localhost:5432/postgres?sslmode=disable" up
 ```
