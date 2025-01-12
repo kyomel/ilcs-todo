@@ -22,6 +22,13 @@ func NewTaskUseCase(repo task.Repository, timeout time.Duration) Usecase {
 }
 
 func (uc *useCase) PostTask(ctx context.Context, req *model.TaskRequest) (*model.Task, error) {
+	ctx, cancel := context.WithTimeout(ctx, uc.ctxTimeout)
+	defer cancel()
+
+	if err := req.Validate(); err != nil {
+		return nil, err
+	}
+
 	task, err := uc.taskRepo.PostTask(ctx, req)
 	if err != nil {
 		return nil, err
@@ -104,6 +111,10 @@ func (uc *useCase) GetTaskByID(ctx context.Context, id uuid.UUID) (*model.Task, 
 func (uc *useCase) UpdateTask(ctx context.Context, id uuid.UUID, req *model.TaskRequest) (*model.Task, error) {
 	ctx, cancel := context.WithTimeout(ctx, uc.ctxTimeout)
 	defer cancel()
+
+	if err := req.Validate(); err != nil {
+		return nil, err
+	}
 
 	task, err := uc.taskRepo.UpdateTask(ctx, id, req)
 	if err != nil {

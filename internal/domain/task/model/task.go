@@ -38,12 +38,21 @@ func (r *TaskRequest) Validate() error {
 		return fmt.Errorf("title is required")
 	}
 
-	if r.Status != "" && !IsValidTaskStatus(r.Status) {
-		return fmt.Errorf("invalid status: must be either 'pending' or 'completed'")
+	if r.Description == "" {
+		return fmt.Errorf("description is required")
 	}
 
-	if r.Status == "" {
-		r.Status = string(TaskStatusPending)
+	if r.DueDate == "" {
+		return fmt.Errorf("due date is required")
+	}
+
+	dueDate, err := time.Parse("2006-01-02", r.DueDate)
+	if err != nil {
+		return fmt.Errorf("invalid due date format: must be YYYY-MM-DD")
+	}
+
+	if dueDate.Before(time.Now().Truncate(24 * time.Hour)) {
+		return fmt.Errorf("due date cannot be in the past")
 	}
 
 	return nil
