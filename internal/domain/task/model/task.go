@@ -22,6 +22,17 @@ type TaskRequest struct {
 	DueDate     string `json:"due_date"`
 }
 
+type Pagination struct {
+	CurrentPage int `json:"current_page"`
+	TotalPages  int `json:"total_pages"`
+	TotalTasks  int `json:"total_tasks"`
+}
+
+type AllTasks struct {
+	Tasks      []*Task     `json:"tasks"`
+	Pagination *Pagination `json:"pagination"`
+}
+
 func (r *TaskRequest) Validate() error {
 	if r.Title == "" {
 		return fmt.Errorf("title is required")

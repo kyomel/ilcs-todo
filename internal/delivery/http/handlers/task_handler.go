@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"strconv"
+
 	"github.com/google/uuid"
 	"github.com/kyomel/ilcs-todo/internal/domain/task/model"
 	"github.com/kyomel/ilcs-todo/pkg/logger"
@@ -56,9 +58,24 @@ func (h *Handlers) PostTask(c echo.Context) error {
 
 func (h *Handlers) GetAllTasks(c echo.Context) error {
 	log := logger.GetLogger()
-
 	ctx := c.Request().Context()
-	tasks, err := h.taskUsecase.GetAllTasks(ctx)
+
+	page := 1
+	limit := 10
+
+	if pageStr := c.QueryParam("page"); pageStr != "" {
+		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
+			page = p
+		}
+	}
+
+	if limitStr := c.QueryParam("limit"); limitStr != "" {
+		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
+			limit = l
+		}
+	}
+
+	response, err := h.taskUsecase.GetAllTasks(ctx, page, limit)
 	if err != nil {
 		log.Errorf(getAllTaskError, err)
 		return c.JSON(500, map[string]interface{}{
@@ -67,9 +84,7 @@ func (h *Handlers) GetAllTasks(c echo.Context) error {
 	}
 
 	log.Info("Get all task successfully")
-	return c.JSON(200, map[string]interface{}{
-		"tasks": tasks,
-	})
+	return c.JSON(200, response)
 }
 
 func (h *Handlers) GetTaskByID(c echo.Context) error {
