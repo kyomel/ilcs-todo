@@ -22,7 +22,6 @@ const (
 
 func (h *Handlers) PostTask(c echo.Context) error {
 	log := logger.GetLogger()
-	log.Info("Received a request to post a task")
 
 	var req model.TaskRequest
 	ctx := c.Request().Context()
@@ -43,7 +42,7 @@ func (h *Handlers) PostTask(c echo.Context) error {
 	task, err := h.taskUsecase.PostTask(ctx, &req)
 	if err != nil {
 		log.Errorf(postTaskError, err)
-		return c.JSON(400, map[string]interface{}{
+		return c.JSON(500, map[string]interface{}{
 			"error": err.Error(),
 		})
 	}
@@ -62,7 +61,7 @@ func (h *Handlers) GetAllTasks(c echo.Context) error {
 	tasks, err := h.taskUsecase.GetAllTasks(ctx)
 	if err != nil {
 		log.Errorf(getAllTaskError, err)
-		return c.JSON(400, map[string]interface{}{
+		return c.JSON(500, map[string]interface{}{
 			"error": err.Error(),
 		})
 	}
@@ -90,7 +89,7 @@ func (h *Handlers) GetTaskByID(c echo.Context) error {
 	task, err := h.taskUsecase.GetTaskByID(ctx, idUUID)
 	if err != nil {
 		log.Errorf(getTaskByIDError, err)
-		return c.JSON(400, map[string]interface{}{
+		return c.JSON(500, map[string]interface{}{
 			"error": err.Error(),
 		})
 	}
@@ -103,7 +102,6 @@ func (h *Handlers) GetTaskByID(c echo.Context) error {
 
 func (h *Handlers) UpdateTask(c echo.Context) error {
 	log := logger.GetLogger()
-	log.Info("Received a request to update task")
 
 	var req model.TaskRequest
 	ctx := c.Request().Context()
@@ -133,7 +131,7 @@ func (h *Handlers) UpdateTask(c echo.Context) error {
 	task, err := h.taskUsecase.UpdateTask(ctx, idUUID, &req)
 	if err != nil {
 		log.Errorf(updateTaskError, err)
-		return c.JSON(400, map[string]interface{}{
+		return c.JSON(500, map[string]interface{}{
 			"error": err.Error(),
 		})
 	}
@@ -147,7 +145,6 @@ func (h *Handlers) UpdateTask(c echo.Context) error {
 
 func (h *Handlers) DeleteTask(c echo.Context) error {
 	log := logger.GetLogger()
-	log.Info("Received a request to delete task")
 
 	id := c.Param("id")
 	ctx := c.Request().Context()
@@ -162,7 +159,7 @@ func (h *Handlers) DeleteTask(c echo.Context) error {
 	err = h.taskUsecase.DeleteTask(ctx, idUUID)
 	if err != nil {
 		log.Errorf(deleteTaskError, err)
-		return c.JSON(400, map[string]interface{}{
+		return c.JSON(500, map[string]interface{}{
 			"error": err.Error(),
 		})
 	}

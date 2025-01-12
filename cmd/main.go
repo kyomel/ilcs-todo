@@ -10,8 +10,10 @@ import (
 	"github.com/kyomel/ilcs-todo/internal/delivery/http/handlers"
 	"github.com/kyomel/ilcs-todo/internal/delivery/http/router"
 	tRepo "github.com/kyomel/ilcs-todo/internal/domain/task/repository"
+	uRepo "github.com/kyomel/ilcs-todo/internal/domain/user/repository"
 	database "github.com/kyomel/ilcs-todo/internal/infrastructure/database"
 	tUC "github.com/kyomel/ilcs-todo/internal/usecase/task"
+	uUC "github.com/kyomel/ilcs-todo/internal/usecase/user"
 	"github.com/kyomel/ilcs-todo/pkg/config"
 	"github.com/labstack/echo/v4"
 )
@@ -26,11 +28,13 @@ func main() {
 	}
 
 	taskRepo := tRepo.NewTaskRepository(dbInstance)
+	userRepo := uRepo.NewUserRepository(dbInstance)
 
 	ctxTimeout := time.Duration(configApp.ContextTimeout) * time.Second
 	taskUC := tUC.NewUsecase(taskRepo, ctxTimeout)
+	userUC := uUC.NewUserUsecase(userRepo, ctxTimeout)
 
-	h := handlers.NewHandler(taskUC)
+	h := handlers.NewHandler(taskUC, userUC)
 
 	router.LoadRoutes(e, h)
 

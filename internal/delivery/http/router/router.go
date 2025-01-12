@@ -16,4 +16,8 @@ func LoadRoutes(e *echo.Echo, handler *handlers.Handlers) {
 	taskGroup.GET("/:id", handler.GetTaskByID)
 	taskGroup.PUT("/:id", handler.UpdateTask)
 	taskGroup.DELETE("/:id", handler.DeleteTask)
+
+	userGroup := e.Group("/users")
+	userGroup.POST("", handler.RegisterUser)
+	userGroup.POST("/login", handler.Login)
 }
