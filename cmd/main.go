@@ -31,7 +31,7 @@ func main() {
 	userRepo := uRepo.NewUserRepository(dbInstance)
 
 	ctxTimeout := time.Duration(configApp.ContextTimeout) * time.Second
-	taskUC := tUC.NewUsecase(taskRepo, ctxTimeout)
+	taskUC := tUC.NewTaskUseCase(taskRepo, ctxTimeout)
 	userUC := uUC.NewUserUsecase(userRepo, ctxTimeout)
 
 	h := handlers.NewHandler(taskUC, userUC)

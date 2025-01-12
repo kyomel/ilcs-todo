@@ -14,28 +14,27 @@ type useCase struct {
 	ctxTimeout time.Duration
 }
 
-func NewUsecase(taskRepo task.Repository, ctxTimeout time.Duration) Usecase {
+func NewTaskUseCase(repo task.Repository, timeout time.Duration) Usecase {
 	return &useCase{
-		taskRepo:   taskRepo,
-		ctxTimeout: ctxTimeout,
+		taskRepo:   repo,
+		ctxTimeout: timeout,
 	}
 }
 
 func (uc *useCase) PostTask(ctx context.Context, req *model.TaskRequest) (*model.Task, error) {
-	ctx, cancel := context.WithTimeout(ctx, uc.ctxTimeout)
-	defer cancel()
-
 	task, err := uc.taskRepo.PostTask(ctx, req)
 	if err != nil {
 		return nil, err
 	}
 
-	return task, err
+	return task, nil
 }
 
 func (uc *useCase) GetAllTasks(ctx context.Context, page, limit int, status, search string) (*model.AllTasks, error) {
 	ctx, cancel := context.WithTimeout(ctx, uc.ctxTimeout)
 	defer cancel()
+
+	var response model.AllTasks
 
 	tasksChan := make(chan []*model.Task, 1)
 	totalChan := make(chan int, 1)
@@ -78,7 +77,7 @@ func (uc *useCase) GetAllTasks(ctx context.Context, page, limit int, status, sea
 	}
 
 	totalPages := (total + limit - 1) / limit
-	response := &model.AllTasks{
+	response = model.AllTasks{
 		Tasks: tasks,
 		Pagination: &model.Pagination{
 			CurrentPage: page,
@@ -87,7 +86,7 @@ func (uc *useCase) GetAllTasks(ctx context.Context, page, limit int, status, sea
 		},
 	}
 
-	return response, nil
+	return &response, nil
 }
 
 func (uc *useCase) GetTaskByID(ctx context.Context, id uuid.UUID) (*model.Task, error) {
