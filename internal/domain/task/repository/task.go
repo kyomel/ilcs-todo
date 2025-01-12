@@ -2,6 +2,7 @@ package task
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -55,30 +56,36 @@ func (r *taskRepo) PostTask(ctx context.Context, req *model.TaskRequest) (*model
 	return &result, nil
 }
 
-func (r *taskRepo) GetTasksPaginated(ctx context.Context, page, limit int, status string) ([]*model.Task, error) {
+func (r *taskRepo) GetTasksPaginated(ctx context.Context, page, limit int, status, search string) ([]*model.Task, error) {
 	offset := (page - 1) * limit
 
 	var query string
 	var args []interface{}
 	args = append(args, limit, offset)
+	paramCount := 3
+
+	baseQuery := `
+		SELECT id, title, description, status, due_date
+		FROM tasks
+		WHERE 1=1
+	`
 
 	if status != "" {
-		query = `
-			SELECT id, title, description, status, due_date
-			FROM tasks
-			WHERE status = $3
-			ORDER BY created_at DESC
-			LIMIT $1 OFFSET $2
-		`
+		baseQuery += fmt.Sprintf(" AND status = $%d", paramCount)
 		args = append(args, status)
-	} else {
-		query = `
-			SELECT id, title, description, status, due_date
-			FROM tasks
-			ORDER BY created_at DESC
-			LIMIT $1 OFFSET $2
-		`
+		paramCount++
 	}
+
+	if search != "" {
+		baseQuery += fmt.Sprintf(" AND (LOWER(title) LIKE LOWER($%d) OR LOWER(description) LIKE LOWER($%d))",
+			paramCount, paramCount)
+		args = append(args, "%"+search+"%")
+	}
+
+	query = baseQuery + `
+		ORDER BY created_at DESC
+		LIMIT $1 OFFSET $2
+	`
 
 	rows, err := r.db.QueryContext(ctx, query, args...)
 	if err != nil {
@@ -105,15 +112,27 @@ func (r *taskRepo) GetTasksPaginated(ctx context.Context, page, limit int, statu
 	return tasks, nil
 }
 
-func (r *taskRepo) GetTotalTasksWithFilter(ctx context.Context, status string) (int, error) {
+func (r *taskRepo) GetTotalTasksWithFilter(ctx context.Context, status, search string) (int, error) {
 	var query string
 	var args []interface{}
+	paramCount := 1
+
+	query = `
+		SELECT COUNT(*)
+		FROM tasks
+		WHERE 1=1
+	`
 
 	if status != "" {
-		query = `SELECT COUNT(*) FROM tasks WHERE status = $1`
+		query += fmt.Sprintf(" AND status = $%d", paramCount)
 		args = append(args, status)
-	} else {
-		query = `SELECT COUNT(*) FROM tasks`
+		paramCount++
+	}
+
+	if search != "" {
+		query += fmt.Sprintf(" AND (LOWER(title) LIKE LOWER($%d) OR LOWER(description) LIKE LOWER($%d))",
+			paramCount, paramCount)
+		args = append(args, "%"+search+"%")
 	}
 
 	var total int

@@ -76,14 +76,15 @@ func (h *Handlers) GetAllTasks(c echo.Context) error {
 	}
 
 	status := c.QueryParam("status")
-	// Validate status if needed
 	if status != "" && status != "pending" && status != "completed" {
 		return c.JSON(400, map[string]interface{}{
 			"error": "Invalid status. Must be either 'pending' or 'completed'",
 		})
 	}
 
-	response, err := h.taskUsecase.GetAllTasks(ctx, page, limit, status)
+	search := c.QueryParam("search")
+
+	response, err := h.taskUsecase.GetAllTasks(ctx, page, limit, status, search)
 	if err != nil {
 		log.Errorf(getAllTaskError, err)
 		return c.JSON(500, map[string]interface{}{
